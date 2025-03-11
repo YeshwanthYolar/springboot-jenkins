@@ -65,3 +65,5 @@ cd sonarqube-9.4.0.54424/bin/linux-x86-64/
 Hurray !! Now you can access the `SonarQube Server` on `http://<ip-address>:9000` 
 
 
+# sonarqube as a container
+docker run -d -p 9000:9000 --name sonar sonarqube:lts
