@@ -13,7 +13,7 @@ pipeline {
     stage('Build and Test') {
       steps {
         sh 'ls -ltr'
-        sh 'cd springboot-jenkins && mvn clean package'
+        sh 'cd springboot && mvn clean package'
       }
     }
     stage('Static Code Analysis') {
@@ -22,7 +22,7 @@ pipeline {
       }
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd springboot-jenkins && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+          sh 'cd springboot && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
         }
       }
     }
@@ -51,8 +51,8 @@ pipeline {
             git config user.email "yolaryeshwanth@gmail.com"
             git config user.name "YeshwanthYolar"
             BUILD_NUMBER=${BUILD_NUMBER}
-            sed -i "s/replaceImageTag/${BUILD_NUMBER}/g"  springboot-jenkins/spring-boot-app-manifests/deployment.yml
-            git add springboot-jenkins/spring-boot-app-manifests/deployment.yml
+            sed -i "s/replaceImageTag/${BUILD_NUMBER}/g"  springboot/spring-boot-app-manifests/deployment.yml
+            git add springboot/spring-boot-app-manifests/deployment.yml
             git commit -m "Update deployment image to version ${BUILD_NUMBER}"
             git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
           '''
