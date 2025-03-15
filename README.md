@@ -1,69 +1,55 @@
-# Spring Boot based Java web application
- 
-This is a simple Sprint Boot based Java application that can be built using Maven. Sprint Boot dependencies are handled using the pom.xml 
-at the root directory of the repository.
+first set up the k8s cluster with the following github link, which contains terraform files for infrastructure creation
+link:-
 
-This is a MVC architecture based application where controller returns a page with title and message attributes to the view.
+there is a script.sh attached to the masternode of the cluster 
+it contains the installation of the following 
+    - unzip , vim 
+    - openjdk-17 (java)
+    - maven
+    - jenkins
+    - docker
+    - kubectl
+    - awscli
+    - aws-iam-authenticator
+    - sonarqube docker container
 
-## Execute the application locally and access it using your browser
+if this script is attached it will install all necessary packages and tools
 
-Checkout the repo and move to the directory
+after all thats installed 
 
-```
-git clone https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero/java-maven-sonar-argocd-helm-k8s/sprint-boot-app
-cd java-maven-sonar-argocd-helm-k8s/sprint-boot-app
-```
+install argocd operator
+here is the link of the operatorhub.io :- https://operatorhub.io/operator/argocd-operator
+click on install and you will get the commands to install olm (operator lifecycle manager) and argocd operator
 
-Execute the Maven targets to generate the artifacts
+after argocd operator is installed then install argocd controllers 
+here is the yaml file for creating basic argocd controllers
 
-```
-mvn clean package
-```
+        apiVersion: argoproj.io/v1alpha1
+        kind: ArgoCD
+        metadata:
+           name: example-argocd
+           labels:
+            example: basic
+        spec:
+         server:
+          service:
+            𝘁𝘆𝗽𝗲: LoadBalancer
 
-The above maven target stroes the artifacts to the `target` directory. You can either execute the artifact on your local machine
-(or) run it as a Docker container.
+use below command to apply
+    kubectl apply -f <file_name>.yml
 
-** Note: To avoid issues with local setup, Java versions and other dependencies, I would recommend the docker way. **
+access the argocd web UI using the loadbalancer URL with below command 
+    kubectl get svc
+if is shows any risk click on advance and accept the risk
 
-
-### Execute locally (Java 11 needed) and access the application on http://localhost:8080
-
-```
-java -jar target/spring-boot-web.jar
-```
-
-### The Docker way
-
-Build the Docker Image
-
-```
-docker build -t ultimate-cicd-pipeline:v1 .
-```
-
-```
-docker run -d -p 8010:8080 -t ultimate-cicd-pipeline:v1
-```
-
-Hurray !! Access the application on `http://<ip-address>:8010`
-
-
-## Next Steps
-
-### Configure a Sonar Server locally
-
-```
-apt install unzip
-adduser sonarqube
-wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.4.0.54424.zip
-unzip *
-chmod -R 755 /home/sonarqube/sonarqube-9.4.0.54424
-chown -R sonarqube:sonarqube /home/sonarqube/sonarqube-9.4.0.54424
-cd sonarqube-9.4.0.54424/bin/linux-x86-64/
-./sonar.sh start
-```
-
-Hurray !! Now you can access the `SonarQube Server` on `http://<ip-address>:9000` 
+by default argocd username will be 'admin'
+password will be stored in secrets 
+    kubectl edit secrets <secret_aplication_name>
+copy the secret as it will be in the base64 encoded format decode using below command 
+    echo <encoded_password> | base64 -d
 
 
 # sonarqube as a container
 docker run -d -p 9000:9000 --name sonar sonarqube:lts
+
+
